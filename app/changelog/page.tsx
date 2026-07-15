@@ -9,6 +9,19 @@ export const metadata: Metadata = {
   description: "Novedades y mejoras de presupuestador.",
 };
 
+// changesets siempre titula estas secciones en inglés (según el bump elegido);
+// las traducimos acá porque esta página la lee gente, no devs.
+const SECTION_LABELS: Record<string, string> = {
+  "Major Changes": "Cambios importantes",
+  "Minor Changes": "Novedades",
+  "Patch Changes": "Correcciones",
+};
+
+function translateHeading(children: React.ReactNode) {
+  const text = typeof children === "string" ? children : String(children);
+  return SECTION_LABELS[text] ?? text;
+}
+
 async function getChangelog() {
   const file = await fs.readFile(
     path.join(process.cwd(), "CHANGELOG.md"),
@@ -42,7 +55,7 @@ export default async function ChangelogPage() {
         Changelog
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Novedades y mejoras, generadas automáticamente a partir de los commits.
+        Novedades y mejoras de presupuestador.
       </p>
 
       <div className="mt-10">
@@ -55,7 +68,7 @@ export default async function ChangelogPage() {
             ),
             h3: ({ children }) => (
               <h3 className="mt-6 text-sm font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                {children}
+                {translateHeading(children)}
               </h3>
             ),
             ul: ({ children }) => (
