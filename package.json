@@ -1,5 +1,5 @@
 {
-  "name": "presupuestador",
+  "name": "presupuestafy",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@11.11.0",
@@ -8,15 +8,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "prettier": "prettier . --write",
     "changeset": "changeset",
     "version-packages": "changeset version"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@react-pdf/renderer": "^4.5.1",
+    "@stepperize/react": "^7.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
+    "geist": "^1.7.2",
     "lucide-react": "^1.24.0",
     "motion": "^12.42.2",
     "next": "16.2.10",
@@ -38,6 +41,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.5",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
