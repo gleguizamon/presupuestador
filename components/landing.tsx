@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QuoteSheet } from "@/components/quote-sheet";
@@ -201,11 +202,17 @@ export function Landing() {
         </div>
       </div>
 
-      <footer className="mx-auto w-full max-w-6xl shrink-0 border-t px-6 py-4">
+      <footer className="mx-auto flex w-full max-w-6xl shrink-0 items-center justify-between gap-4 border-t px-6 py-4">
         <p className="truncate font-mono text-xs text-muted-foreground">
           presupuestador — tus datos viven en tu navegador y en los links que
           compartís.
         </p>
+        <Link
+          href="/changelog"
+          className="shrink-0 font-mono text-xs text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
+        >
+          Changelog
+        </Link>
       </footer>
     </div>
   );
