@@ -12,7 +12,7 @@ async function getStars() {
   return data.stargazers_count;
 }
 
-function GitHubMark({ className }: { className?: string }) {
+export function GitHubMark({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -47,7 +47,7 @@ export default async function GithubStarButton() {
       target="_blank"
       rel="noreferrer noopener"
       aria-label={`Star ${BRAND_NAME} on GitHub`}
-      className="bg-card/60 text-muted-foreground hover:text-foreground hidden items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors sm:inline-flex"
+      className="bg-secondary text-muted-foreground hover:text-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
     >
       <GitHubMark className="size-4" />
       <Star className="size-3.5 text-amber-500" aria-hidden />

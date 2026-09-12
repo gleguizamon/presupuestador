@@ -1,96 +1,65 @@
-export type QuoteItem = {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-};
+import { Doc, emptyDoc } from '@/lib/doc/types';
 
-export type TemplateId = 'minimal' | 'clasica' | 'calida';
+export { computeTotals, formatMoney, LAYOUTS, FONTS, CURRENCIES, newItem } from '@/lib/doc/types';
+export type { Doc, LayoutId, FontId, QuoteItem, Party } from '@/lib/doc/types';
 
-export type Quote = {
-  number: string;
-  date: string; // ISO yyyy-mm-dd
-  validUntil: string; // ISO yyyy-mm-dd
-  currency: string;
-  from: { name: string; detail: string };
-  to: { name: string; detail: string };
-  items: QuoteItem[];
-  discountPct: number;
-  taxPct: number;
-  notes: string;
-  template: TemplateId;
-  /** PNG data URL, kept in the local draft and the PDF but never in share links. */
-  logo?: string;
-};
-
-export const TEMPLATES: { id: TemplateId; name: string; swatch: string }[] = [
-  { id: 'minimal', name: 'Minimal', swatch: '#171717' },
-  { id: 'clasica', name: 'Clásica', swatch: '#e5e5e5' },
-  { id: 'calida', name: 'Cálida', swatch: '#cbb3a4' }
-];
-
-export const CURRENCIES = [
-  { code: 'ARS', label: 'ARS — Peso argentino' },
-  { code: 'USD', label: 'USD — Dólar' },
-  { code: 'EUR', label: 'EUR — Euro' },
-  { code: 'MXN', label: 'MXN — Peso mexicano' },
-  { code: 'CLP', label: 'CLP — Peso chileno' },
-  { code: 'COP', label: 'COP — Peso colombiano' },
-  { code: 'UYU', label: 'UYU — Peso uruguayo' },
-  { code: 'PEN', label: 'PEN — Sol peruano' },
-  { code: 'BRL', label: 'BRL — Real brasileño' }
-] as const;
-
-export function newItem(): QuoteItem {
-  return {
-    id: Math.random().toString(36).slice(2, 10),
-    description: '',
-    quantity: 1,
-    unitPrice: 0
-  };
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
-export function emptyQuote(): Quote {
-  const today = new Date();
-  const valid = new Date(today);
-  valid.setDate(valid.getDate() + 30);
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
-  return {
-    number: `P-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-01`,
-    date: iso(today),
-    validUntil: iso(valid),
-    currency: 'ARS',
-    from: { name: '', detail: '' },
-    to: { name: '', detail: '' },
-    items: [newItem()],
-    discountPct: 0,
-    taxPct: 0,
-    notes: '',
-    template: 'minimal'
-  };
-}
+/** Keys never dropped from a share payload even when they equal the default:
+ *  `emptyDoc()` derives them from *today*, so re-filling them on the
+ *  recipient's machine (possibly a different day) would silently change the
+ *  document. */
+const KEEP_IN_SHARE = new Set(['date', 'validUntil']);
 
-export function computeTotals(q: Quote) {
-  const subtotal = q.items.reduce((acc, it) => acc + (it.quantity || 0) * (it.unitPrice || 0), 0);
-  const discount = subtotal * ((q.discountPct || 0) / 100);
-  const taxBase = subtotal - discount;
-  const tax = taxBase * ((q.taxPct || 0) / 100);
-  return { subtotal, discount, tax, total: taxBase + tax };
-}
-
-export function formatMoney(value: number, currency: string) {
-  try {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency,
-      currencyDisplay: 'narrowSymbol'
-    }).format(value);
-  } catch {
-    return value.toFixed(2);
+/** Recursively drops every value equal to the same path in `ref` (a fresh
+ *  `emptyDoc`), so a share link only carries what the user actually changed.
+ *  `withDocDefaults` puts the defaults back on the other side. Arrays are
+ *  kept whole (positional, and item ids must survive the round-trip). */
+function stripDefaults(value: unknown, ref: unknown): unknown {
+  if (isPlainObject(value) && isPlainObject(ref)) {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (KEEP_IN_SHARE.has(k)) {
+        out[k] = v;
+        continue;
+      }
+      const kept = stripDefaults(v, ref[k]);
+      if (kept !== undefined) out[k] = kept;
+    }
+    return Object.keys(out).length > 0 ? out : undefined;
   }
+  return JSON.stringify(value) === JSON.stringify(ref) ? undefined : value;
 }
 
-// --- Share links: quote serialized as base64url JSON in the URL hash ---
+/** Deep-merges plain objects (later sources win); arrays and primitives
+ *  replace wholesale. The read side of `stripDefaults` — a partial `body` or
+ *  `from` in the payload merges onto the `emptyDoc` shape instead of
+ *  clobbering the sibling defaults a shallow spread would drop. */
+function deepMerge(
+  ...sources: Array<Record<string, unknown> | undefined>
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const src of sources) {
+    if (!src) continue;
+    for (const [k, v] of Object.entries(src)) {
+      out[k] =
+        isPlainObject(v) && isPlainObject(out[k])
+          ? deepMerge(out[k] as Record<string, unknown>, v)
+          : v;
+    }
+  }
+  return out;
+}
+
+/** Merges a parsed share payload (already `stripDefaults`-trimmed) onto a
+ *  fresh document, so the URL only has to carry what the user changed. */
+export function withDocDefaults(parsed: Record<string, unknown>): Doc {
+  return deepMerge(emptyDoc() as unknown as Record<string, unknown>, parsed) as unknown as Doc;
+}
+
+// --- Share links: doc serialized as base64url JSON in the URL hash ---
 //
 // Edit protection without a backend: every shared payload carries the SHA-256
 // hash of a random edit key ("eh"). Only the editable link also carries the
@@ -109,12 +78,12 @@ function fromB64url(s: string): Uint8Array {
   return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 }
 
-function parsePayload(json: string): { quote: Quote; editHash?: string } | null {
+function parsePayload(json: string): { doc: Doc; editHash?: string } | null {
   const parsed = JSON.parse(json);
-  if (!parsed || !Array.isArray(parsed.items)) return null;
+  if (!parsed || typeof parsed !== 'object') return null;
   const { eh, ...rest } = parsed;
   return {
-    quote: { ...emptyQuote(), ...rest } as Quote,
+    doc: withDocDefaults(rest),
     editHash: typeof eh === 'string' ? eh : undefined
   };
 }
@@ -128,11 +97,22 @@ async function pipeBytes(
 }
 
 /** Returns the share hash fragment: "c=…" (deflate, ~half the size) or the
- *  uncompressed "d=…" when CompressionStream isn't available. */
-export async function encodeSharePayload(q: Quote, editHash?: string): Promise<string> {
-  // A base64 logo would blow the link up to tens of thousands of chars.
-  const { logo: _logo, ...shareable } = q;
-  const payload = editHash ? { ...shareable, eh: editHash } : shareable;
+ *  uncompressed "d=…" when CompressionStream isn't available. Drops the id and
+ *  timestamps (a shared link is a stateless snapshot, not a synced record),
+ *  the logo and the drawn signature from `body` (both are multi-KB PNG data
+ *  URLs — they'd push the URL past QR capacity, and a real signature isn't
+ *  something to carry in a pasteable link), and then every field still at its
+ *  `emptyDoc` default, so the URL only carries what the user actually filled
+ *  in (`withDocDefaults` restores the rest). */
+export async function encodeSharePayload(doc: Doc, editHash?: string): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- omit these three, keep the rest
+  const { id, createdAt, updatedAt, ...shareable } = doc;
+  const body = { ...shareable.body };
+  delete body.logo;
+  if (body.signature) body.signature = '';
+  const stripped = { ...shareable, body };
+  const trimmed = (stripDefaults(stripped, emptyDoc()) as Record<string, unknown>) ?? {};
+  const payload = editHash ? { ...trimmed, eh: editHash } : trimmed;
   const bytes = new TextEncoder().encode(JSON.stringify(payload));
   if (typeof CompressionStream !== 'undefined') {
     try {
@@ -147,7 +127,7 @@ export async function encodeSharePayload(q: Quote, editHash?: string): Promise<s
 
 export async function decodeShareParams(
   params: URLSearchParams
-): Promise<{ quote: Quote; editHash?: string } | null> {
+): Promise<{ doc: Doc; editHash?: string } | null> {
   try {
     const compressed = params.get('c');
     if (compressed) {
