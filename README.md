@@ -6,11 +6,6 @@ que facturan y se comunican con sus clientes por su cuenta.
 
 ## Capturas
 
-<!--
-  Reemplazá estos placeholders por capturas reales — instrucciones más abajo
-  en "Cómo sacar y agregar las capturas".
--->
-
 | Home | Editor |
 | --- | --- |
 | ![Home](docs/screenshots/home.png) | ![Editor](docs/screenshots/editor.png) |
@@ -71,30 +66,6 @@ hash de una URL de share. El PDF se genera en el propio navegador con
 `@react-pdf/renderer`. Si querés meterte más a fondo en la arquitectura,
 `CLAUDE.md` documenta el modelo de datos, las rutas y las convenciones del
 proyecto.
-
-## Cómo sacar y agregar las capturas
-
-1. Corré la app localmente (`pnpm dev`) y navegá a las pantallas que querés
-   mostrar (la home, el editor con un presupuesto de ejemplo cargado, etc.).
-2. En macOS, sacá la captura con:
-   - `Cmd + Shift + 4` y arrastrá para seleccionar un área, o
-   - `Cmd + Shift + 4` y luego `Espacio` para capturar una ventana completa
-     (con su sombra — tocá `Option` mientras clickeás para sacarla sin
-     sombra), o
-   - `Cmd + Shift + 5` para abrir la barra de herramientas de captura, elegir
-     "Ventana" o "Selección" y fijar la carpeta de destino desde "Opciones".
-   Por default, la captura se guarda en el Escritorio como
-   `Screenshot <fecha> at <hora>.png`.
-3. Movela (o renombrala directamente al guardar) a `docs/screenshots/` con un
-   nombre descriptivo, por ejemplo `home.png` o `editor.png` — esos son los
-   nombres que ya están referenciados en la tabla de arriba.
-4. Si el archivo pesa mucho (las capturas Retina salen grandes), achicalo
-   antes de commitear, por ejemplo:
-   ```bash
-   sips -Z 1600 docs/screenshots/*.png   # reescala el lado mayor a 1600px
-   ```
-5. `git add docs/screenshots/*.png` y commiteá — el README ya las va a
-   mostrar apenas existan en esa carpeta.
 
 ## Licencia
 
