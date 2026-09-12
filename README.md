@@ -1,8 +1,26 @@
 # Presupuestapp
 
-Creá presupuestos profesionales, exportalos a PDF y compartilos con un link — sin
-cuenta, sin backend, sin suscripción. Pensado para freelancers e independientes
-que facturan y se comunican con sus clientes por su cuenta.
+**Presupuestos, sin vueltas.** Armá un presupuesto profesional, exportalo a
+PDF y compartilo por link — sin cuenta, sin backend, sin suscripción.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![No backend](https://img.shields.io/badge/backend-none-8A2BE2)
+
+**Idioma:** Español · [English](README.en.md) · [Português (Brasil)](README.pt-BR.md)
+
+## Índice
+
+- [Capturas](#capturas)
+- [Por qué existe](#por-qué-existe)
+- [Funcionalidad](#funcionalidad)
+- [Stack](#stack)
+- [Empezar a desarrollar](#empezar-a-desarrollar)
+- [Cómo funciona](#cómo-funciona-a-grandes-rasgos)
+- [Contribuir](#contribuir)
+- [Licencia](#licencia)
 
 ## Capturas
 
@@ -31,11 +49,12 @@ que facturan y se comunican con sus clientes por su cuenta.
 
 ## Stack
 
-[Next.js 16](https://nextjs.org) (App Router) · [React 19](https://react.dev) ·
-TypeScript · [Tailwind CSS v4](https://tailwindcss.com) ·
-[shadcn/ui](https://ui.shadcn.com) sobre [Base UI](https://base-ui.com) ·
-[@react-pdf/renderer](https://react-pdf.org) · [idb](https://github.com/jakearchibald/idb)
-para IndexedDB.
+| Categoría | Tecnología |
+| --- | --- |
+| Framework | [Next.js 16](https://nextjs.org) (App Router) · [React 19](https://react.dev) · TypeScript |
+| UI | [Tailwind CSS v4](https://tailwindcss.com) · [shadcn/ui](https://ui.shadcn.com) sobre [Base UI](https://base-ui.com) · [Geist](https://vercel.com/font) · [lucide-react](https://lucide.dev) |
+| Documentos y datos | [@react-pdf/renderer](https://react-pdf.org) (PDF en el navegador) · [idb](https://github.com/jakearchibald/idb) (IndexedDB) · [qrcode.react](https://github.com/zpao/qrcode.react) · [JSZip](https://stuk.github.io/jszip/) |
+| Calidad | ESLint · Prettier |
 
 ## Empezar a desarrollar
 
@@ -66,6 +85,10 @@ hash de una URL de share. El PDF se genera en el propio navegador con
 `@react-pdf/renderer`. Si querés meterte más a fondo en la arquitectura,
 `CLAUDE.md` documenta el modelo de datos, las rutas y las convenciones del
 proyecto.
+
+## Contribuir
+
+Ver [`CONTRIBUTING.md`](CONTRIBUTING.md) (en inglés).
 
 ## Licencia
 
