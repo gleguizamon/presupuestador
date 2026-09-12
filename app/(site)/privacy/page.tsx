@@ -17,6 +17,17 @@ export default function PrivacyPage() {
       </p>
 
       <h2 className="text-muted-foreground mt-12 font-mono text-sm font-semibold tracking-[0.15em] uppercase">
+        Sin garantías
+      </h2>
+      <p className="text-muted-foreground mt-2 max-w-xl text-sm">
+        {BRAND_NAME} es un proyecto de código abierto que se ofrece tal cual, sin garantías de
+        ningún tipo. No nos hacemos responsables por errores en los cálculos, pérdida de
+        documentos (por ejemplo, si tu navegador borra el almacenamiento local) ni por el uso que
+        le des a los presupuestos generados. Usalo bajo tu propio criterio y hacé tus propias
+        copias de lo que te importe conservar.
+      </p>
+
+      <h2 className="text-muted-foreground mt-12 font-mono text-sm font-semibold tracking-[0.15em] uppercase">
         ¿Tenés preguntas?
       </h2>
       <p className="text-muted-foreground mt-2 max-w-xl text-sm">
