@@ -39,6 +39,11 @@ yarn-error.log*
 # claude code local settings/scratch (personal, not shared)
 /.claude/
 
+# internal working docs — local only, not part of the public repo
+/SEO.md
+/IDEAS.md
+/LAUNCH.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
